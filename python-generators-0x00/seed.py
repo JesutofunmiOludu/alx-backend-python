@@ -124,7 +124,7 @@ def seed_data_from_csv(connection, csv_file='user_data.csv'):
 # ----------------------------
 if __name__ == "__main__":
     # Step 1: Connect to MySQL Server
-    server_conn = connect_db(user='root', password='your_mysql_password')
+    server_conn = connect_db(user='root', password='psswrd123')
 
     # Step 2: Create Database
     if server_conn:
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         server_conn.close()
 
     # Step 3: Connect to ALX_prodev
-    db_conn = connect_to_prodev(user='root', password='your_mysql_password')
+    db_conn = connect_to_prodev(user='root', password='psswrd123')
 
     # Step 4: Create Table
     if db_conn:
