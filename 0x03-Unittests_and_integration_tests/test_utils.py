@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import unittest
 from parameterized import parameterized
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 from unittest.mock import patch
 import requests
 
-
+#print("TestAccessNestedMap loaded")
 class TestAccessNestedMap(unittest.TestCase):
     @parameterized.expand([
         ({"a": 1}, ("a",), 1),
@@ -38,6 +38,23 @@ class TestGetJson(unittest.TestCase):
         result = get_json(url)
         self.assertEqual(result, expected_payload)
         mock_get.assert_called_once_with(url)
+class TestMemoize(unittest.TestCase):
+    def test_memoize(self):
+        class TestClass:
+            def a_method(self):
+             return 42
+
+            @memoize
+            def a_property(self):
+              return self.a_method()
+        test_obj = TestClass()
+        with patch.object(test_obj, 'a_method', return_value=42) as mock_method:
+            result1 = test_obj.a_property
+            result2 = test_obj.a_property
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
+            mock_method.assert_called_once()
+    
 
 if __name__ == "__main__":
     unittest.main()
