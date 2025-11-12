@@ -90,32 +90,24 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up class fixtures before running tests"""
-        # Define a side_effect function to return appropriate payloads
-        def get_json_side_effect(url):
-            """Mock for requests.get().json()"""
-            # Create a mock response object
-            mock_response = unittest.mock.Mock()
-            
-            # Return org_payload for org URL
+        def get_side_effect(url):
+            """Side effect function for requests.get mock"""
+            mock_response = Mock()
             if url == "https://api.github.com/orgs/google":
                 mock_response.json.return_value = cls.org_payload
-            # Return repos_payload for repos URL
             elif url == cls.org_payload.get("repos_url"):
                 mock_response.json.return_value = cls.repos_payload
             else:
                 mock_response.json.return_value = None
-            
             return mock_response
         
-        # Start patching requests.get
-        cls.get_patcher = patch('requests.get', side_effect=get_json_side_effect)
+        cls.get_patcher = patch('requests.get', side_effect=get_side_effect)
         cls.get_patcher.start()
 
     @classmethod
     def tearDownClass(cls):
         """Tear down class fixtures after running tests"""
         cls.get_patcher.stop()
-
 
 
 if __name__ == "__main__":
