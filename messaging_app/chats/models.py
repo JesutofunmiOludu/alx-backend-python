@@ -11,6 +11,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ADMIN = 'admin', 'Admin'
 
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    password = models.CharField(max_length=128, null=False , blank=False)
     first_name = models.CharField(max_length=30, null=False , blank=False)
     last_name = models.CharField(max_length=30, null=False , blank=False)
     email = models.EmailField(unique=True , null=False , blank=False)
@@ -65,7 +66,7 @@ class ConversationParticipant(models.Model):
     def __str__(self):
         return f"{self.user.email} in {self.conversation.conversation_id}"
 
-class Conversation(models.Model):
+class Message(models.Model):
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
