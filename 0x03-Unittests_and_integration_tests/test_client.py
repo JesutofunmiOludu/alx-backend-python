@@ -105,10 +105,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
                 mock_response.json.return_value = None
             return mock_response
 
-        cls.get_patcher = patch(
-            'client.requests.get',
-            side_effect=get_side_effect
-        )
+        cls.get_patcher = patch('requests.get', side_effect=get_side_effect)
         cls.get_patcher.start()
 
     @classmethod
