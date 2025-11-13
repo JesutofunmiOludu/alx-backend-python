@@ -5,7 +5,12 @@ import unittest
 from unittest.mock import patch, PropertyMock, Mock
 from parameterized import parameterized, parameterized_class
 from client import GithubOrgClient
-from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
+from fixtures import (
+    org_payload,
+    repos_payload,
+    expected_repos,
+    apache2_repos
+)
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -53,13 +58,17 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_get_json.return_value = mock_repos_payload
         with patch('client.GithubOrgClient._public_repos_url',
                    new_callable=PropertyMock) as mock_public_repos_url:
-            mock_public_repos_url.return_value = "https://api.github.com/orgs/google/repos"
+            mock_public_repos_url.return_value = (
+                "https://api.github.com/orgs/google/repos"
+            )
             client = GithubOrgClient("google")
             result = client.public_repos()
             expected_repos = ["repo1", "repo2", "repo3"]
             self.assertEqual(result, expected_repos)
             mock_public_repos_url.assert_called_once()
-            mock_get_json.assert_called_once_with("https://api.github.com/orgs/google/repos")
+            mock_get_json.assert_called_once_with(
+                "https://api.github.com/orgs/google/repos"
+            )
 
     @parameterized.expand([
         ({"license": {"key": "my_license"}}, "my_license", True),
@@ -95,8 +104,11 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
             else:
                 mock_response.json.return_value = None
             return mock_response
-        
-        cls.get_patcher = patch('client.requests.get', side_effect=get_side_effect)
+
+        cls.get_patcher = patch(
+            'client.requests.get',
+            side_effect=get_side_effect
+        )
         cls.get_patcher.start()
 
     @classmethod
@@ -105,7 +117,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.get_patcher.stop()
 
     def test_public_repos(self):
-        """Test that public_repos returns expected results from fixtures"""
+        """Test public_repos returns expected results from fixtures"""
         client = GithubOrgClient("google")
         result = client.public_repos()
         self.assertEqual(result, self.expected_repos)
