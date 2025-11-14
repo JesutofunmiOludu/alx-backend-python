@@ -9,7 +9,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
         user = self.request.user
-        return Conversation.objects.filter(participants=user).prefetch_related('participants', 'messages')
+        return Conversation.objects.filters(participants=user).prefetch_related('participants', 'messages')
     def get_serializer_class(self):
         if self.action == 'list':
             return ConversationListSerializer
@@ -209,7 +209,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         Return only messages from conversations the authenticated user is part of.
         """
         user = self.request.user
-        return Message.objects.filter(
+        return Message.objects.filters(
             conversation__participants=user
         ).select_related('sender', 'conversation').distinct()
     
