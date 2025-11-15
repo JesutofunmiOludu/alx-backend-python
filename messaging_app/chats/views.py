@@ -99,7 +99,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
             status=status.HTTP_204_NO_CONTENT
         )
     
-    @action(detail=True, methods=['post'])
+#    @action(detail=True, methods=['post'])
     def add_participant(self, request, pk=None):
         """
         Add a participant to an existing conversation.
@@ -140,7 +140,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
         serializer = ConversationSerializer(conversation)
         return Response(serializer.data)
     
-    @action(detail=True, methods=['post'])
+    #@action(detail=True, methods=['post'])
     def remove_participant(self, request, pk=None):
         """
         Remove a participant from a conversation.
@@ -325,7 +325,7 @@ class MessageViewSet(viewsets.ModelViewSet):
             status=status.HTTP_204_NO_CONTENT
         )
     
-    @action(detail=False, methods=['get'], url_path='conversation/(?P<conversation_id>[^/.]+)')
+    #@action(detail=False, methods=['get'], url_path='conversation/(?P<conversation_id>[^/.]+)')
     def by_conversation(self, request, conversation_id=None):
         """
         Get all messages in a specific conversation.
