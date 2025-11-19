@@ -4,26 +4,46 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 
 # Create your models here.
 
-class User(AbstractBaseUser, PermissionsMixin):
-    class Role(models.TextChoices):
-        GUEST = 'guest', 'Guest'
-        HOST = 'host', 'Host'
-        ADMIN = 'admin', 'Admin'
-
-    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    password = models.CharField(max_length=128, null=False , blank=False)
-    first_name = models.CharField(max_length=30, null=False , blank=False)
-    last_name = models.CharField(max_length=30, null=False , blank=False)
-    email = models.EmailField(unique=True , null=False , blank=False)
-    phone_number = models.CharField(max_length=15, null=True , blank=True)
-    role = models.CharField(max_length=10, choices=Role.choices, default=Role.GUEST)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-
+class User(AbstractBaseUser):
+    """
+    Extended User model with additional fields for the application.
+    Inherits from Django's AbstractUser which provides username, email, password, etc.
+    """
+    ROLE_CHOICES = [
+        ('guest', 'Guest'),
+        ('host', 'Host'),
+        ('admin', 'Admin'),
+    ]
+    
+    # Using UUID as primary key
+    user_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        db_index=True
+    )
+    
+    # Override first_name and last_name to make them required
+    first_name = models.CharField(max_length=150, null=False, blank=False)
+    last_name = models.CharField(max_length=150, null=False, blank=False)
+    
+    # Email is already provided by AbstractUser, but we ensure it's unique
+    email = models.EmailField(unique=True, null=False, blank=False)
+    
+    d_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'user'
+        indexes = [
+            models.Index(fields=['email']),
+        ]
+    
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.email})"
+    
+    # Override the USERNAME_FIELD to use email for authentication
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name','password']
-    objects = BaseUserManager()
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 class Conversation(models.Model):
     conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     participants = models.ManyToManyField(User, related_name='conversations', through='ConversationParticipant')

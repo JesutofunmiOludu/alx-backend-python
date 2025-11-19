@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chats',
     'rest_framework',
+    'djangorestframework-simplejwt',
 ]
 
 REST_FRAMEWORK = {
