@@ -3,10 +3,18 @@ from rest_framework import viewsets
 from .models import User, Conversation, Message
 from .serializers import UserSerializer, ConversationSerializer, MessageSerializer, ConversationListSerializer
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsConversationParticipant
 
 # Create your views here.
 class ConversationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        permission = [IsAuthenticated]
+        if self.action in ['retrieve', 'update', 'partial_update', 'destroy', 'add_participant', 'remove_participant']:
+            permission.append(IsConversationParticipant())
+
+        return permission
+    
     def get_queryset(self):
         user = self.request.user
         return Conversation.objects.filters(participants=user).prefetch_related('participants', 'messages')
