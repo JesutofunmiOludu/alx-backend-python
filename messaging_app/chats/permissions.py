@@ -1,3 +1,4 @@
+from rest_framework import permissions
 from rest_framework_.permissions import BasePermission, SAFE_METHODS
 from .models import Chat, ChatMember
 
