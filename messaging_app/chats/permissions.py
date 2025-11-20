@@ -1,6 +1,6 @@
 from rest_framework import permissions
-from rest_framework_.permissions import BasePermission, SAFE_METHODS
-from .models import Chat, ChatMember
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+from .models import Message, ConversationParticipant
 
 class IsChatMember(BasePermission):
     """
@@ -9,8 +9,8 @@ class IsChatMember(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # Assuming 'obj' is an instance of Chat
-        if isinstance(obj, Chat):
-            return ChatMember.objects.filter(chat=obj, user=request.user).exists()
+        if isinstance(obj, Message):
+            return ConversationParticipant.objects.filter(chat=obj, user=request.user).exists()
         return False
     
 class IsMessageSender(BasePermission):
