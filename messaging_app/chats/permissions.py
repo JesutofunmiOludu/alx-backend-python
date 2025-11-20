@@ -24,4 +24,13 @@ class IsMessageSender(BasePermission):
             return True
         return obj.sender == request.user
     
-    
+class IsConversationParticipant(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if hasattr(obj, 'conversation'):
+            return user in obj.conversation.participants.all()
+
+        # If the object is a Conversation instance
+        if hasattr(obj, 'participants'):
+            return user in obj.participants.all()
+
+        return False
