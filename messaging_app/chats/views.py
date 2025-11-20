@@ -210,7 +210,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     - GET /messages/conversation/{conversation_id}/ - Get all messages in a conversation
     """
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsConversationParticipant]
     
     def get_queryset(self):
         """
