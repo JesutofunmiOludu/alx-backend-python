@@ -34,3 +34,30 @@ class RestrictAccessByTimeMiddleware:
         
         response = self.get_response(request)
         return response
+
+class OffensiveLanguageMiddleware:
+    RATE_LIMIT = 5  # Max messages allowed
+    TIME_WINDOW_SECONDS = 60
+
+    def __init__(self, get_response):
+        self.request_log = {}
+        self.get_response = get_response
+
+    def __call__(self, request):
+
+        ip_address = request.META.get('REMOTE_ADDR')
+        current_time = datetime.now().timestamp()
+        if ip_address not in self.request_log:
+            self.request_log[ip_address] = []
+        cutoff_time = current_time - self.TIME_WINDOW_SECONDS
+        self.request_log[ip_address] = [
+            t for t in self.request_log[ip_address] if t > cutoff_time]
+        request_count = len(self.request_log[ip_address])
+        if request_count >= self.RATE_LIMIT:
+            from django.http import HttpResponseTooManyRequests
+            return HttpResponseTooManyRequests("Too many requests. Please try again later.")
+        else:
+            self.request_log[ip_address].append(current_time)
+        response = self.get_response(request)
+        return response
+
