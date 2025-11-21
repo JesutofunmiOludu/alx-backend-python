@@ -1,5 +1,7 @@
 from datetime import datetime
 from django.contrib.auth.models import AnonymousUser
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseTooManyRequests
 
 class RequestLoggingMiddleware(object):
     """
@@ -54,10 +56,32 @@ class OffensiveLanguageMiddleware:
             t for t in self.request_log[ip_address] if t > cutoff_time]
         request_count = len(self.request_log[ip_address])
         if request_count >= self.RATE_LIMIT:
-            from django.http import HttpResponseTooManyRequests
+            
             return HttpResponseTooManyRequests("Too many requests. Please try again later.")
         else:
             self.request_log[ip_address].append(current_time)
         response = self.get_response(request)
         return response
 
+class RolePermissionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.restricted_paths = {
+            '/admin/': ['admin'],
+            '/moderator/': ['admin', 'moderator'],
+        }
+
+    def __call__(self, request):
+        if request.path in self.restricted_paths:
+            if not request.user.is_authenticated:
+               
+                return HttpResponseForbidden("You must be logged in to access this page.")
+            user_role = getattr(request.user, 'role', 'user')
+            is_admin = user.is_active and user.is_superuser
+            is_moderator = user.groups.filter(name='moderator').exists()
+            if not(is_admin or is_moderator):
+                
+                return HttpResponseForbidden("Error 403 Forbidden:You do not have permission to access this page.")
+        
+        response = self.get_response(request)
+        return response
