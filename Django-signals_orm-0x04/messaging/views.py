@@ -8,7 +8,7 @@ from .models import Message, Notification
 
 User = get_user_model()
 @login_required
-def delete_account(request):
+def delete_user(request):
     user = request.user
     logout(request)
     user.delete()
