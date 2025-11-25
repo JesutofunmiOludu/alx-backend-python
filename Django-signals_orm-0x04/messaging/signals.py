@@ -15,9 +15,10 @@ def message_log(sender, instance, **kwargs):
     if instance.pk:
         previous = Message.objects.get(pk=instance.pk)
         if previous.content != instance.content:
+            instance.edited = True
             
             MessageHistory.objects.create(
                 message=instance,
                 previous_content=previous.content
             )
-        Message.history.all()
+        MessageHistory.all()
