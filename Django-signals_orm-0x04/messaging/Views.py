@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth import get_user_model
 
 from .models import Message, Notification
-
+"from .utils import get_message_thread"
 
 User = get_user_model()
 @login_required
