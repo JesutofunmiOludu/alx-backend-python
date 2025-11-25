@@ -31,3 +31,10 @@ def threaded_messages_view(request):
     threads = [get_message_thread(msg) for msg in top_messages]
 
     return render(request, 'messaging/threaded_messages.html', {'threads': threads})
+
+@login_required
+def unread_messages_view(request):
+    user = request.user
+    unread_messages = Message.unread.for_user(user)
+    
+    return render(request, 'messaging/unread_messages.html', {'messages': unread_messages})

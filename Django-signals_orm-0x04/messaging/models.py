@@ -4,6 +4,10 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class UnreadMessageManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(receiver=user, read=False).only('id', 'sender', 'content', 'timestamp')
+
 class Message(models.Model):
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
@@ -13,8 +17,17 @@ class Message(models.Model):
     edited = models.BooleanField(default=False)
     parent_message = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     
+    
+
+    # Managers
+    objects = models.Manager()  # default manager
+    unread = UnreadMessagesManager()  # custom manager for unread messages
+
+
     def __str__(self):
         return f'Message from {self.sender} to {self.recipient} at {self.timestamp}'
+
+
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(User, related_name='conversations')
