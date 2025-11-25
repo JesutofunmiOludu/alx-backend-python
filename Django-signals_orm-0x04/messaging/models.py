@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class UnreadMessageManager(models.Manager):
-    def for_user(self, user):
+    def unread_for_user(self, user):
         return self.filter(receiver=user, read=False).only('id', 'sender', 'content', 'timestamp')
 
 class Message(models.Model):
