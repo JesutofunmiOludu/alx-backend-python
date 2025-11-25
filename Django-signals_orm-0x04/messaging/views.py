@@ -16,6 +16,7 @@ def delete_user(request):
 
 def thread_messages(request, user_id):
     other_user = User.objects.get(id=user_id)
+    sender=request.user
     messages = Message.objects.filter(parenrt_message__isnull=True).filter\
         .selected_related('sender', 'receiver')\
         .prefetch_related('replies_sender', 'replies_receiver')
