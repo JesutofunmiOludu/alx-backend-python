@@ -38,3 +38,12 @@ def unread_messages_view(request):
     unread_messages = Message.unread.unread_for_user
     
     return render(request, 'messaging/unread_messages.html', {'messages': unread_messages})
+
+@cache_page(60)  # Cache the view for 15 minutes
+def conversation_view(request, conversation_id):
+    messages = Message.objects.filter(parent_message__isnull = True, 
+                                     reciever = request.user
+                                     ).select_related('sender').prefetch_related('replies')
+    return render(request, 'chats/conversation.html', {
+        "messages": messages
+    })
