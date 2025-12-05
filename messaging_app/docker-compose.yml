@@ -6,7 +6,7 @@ services:
     environment:
       MYSQL_USER: messaging_user
       MYSQL_PASSWORD: messaging_pass
-      MYSQL_DATABASE: messaging_db
+      MYSQL_DB: messaging_db
       MYSQL_ROOT_PASSWORD: root_pass
     ports:
       - "3307:3306"
