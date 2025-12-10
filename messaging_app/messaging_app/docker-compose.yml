@@ -1,0 +1,31 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: messaging_db
+    restart: always
+    environment:
+      MYSQL_USER: messaging_user
+      MYSQL_PASSWORD: messaging_pass
+      MYSQL_DB: messaging_db
+      MYSQL_ROOT_PASSWORD: root_pass
+    ports:
+      - "3307:3306"   # host:container
+    volumes:
+      - db_data:/var/lib/mysql   # <--- This persists data
+    
+
+  web:
+    build: .   # tells docker-compose to build from Dockerfile
+    container_name: messaging_web
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+volumes:
+  db_data:
