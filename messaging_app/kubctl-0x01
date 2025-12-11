@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# kubctl-0x01 - Scale Django app and monitor
+
+set -e
+
+DEPLOYMENT_NAME="messaging-app-deployment"
+NAMESPACE="default"   # change if you are using a different namespace
+REPLICAS=3
+APP_URL="http://localhost:8000/"  # change if different service URL
+
+echo "🚀 Scaling deployment $DEPLOYMENT_NAME to $REPLICAS replicas..."
+kubectl scale deployment "$DEPLOYMENT_NAME" --replicas=$REPLICAS
+
+echo "⏳ Waiting for pods to be ready..."
+sleep 10
+
+echo "📦 Verifying pods..."
+kubectl get pods
+
+# Load testing (requires wrk installed)
+if command -v wrk >/dev/null 2>&1; then
+    echo "⚡ Performing load test using wrk..."
+    wrk -t2 -c5 -d10s $APP_URL
+else
+    echo "⚠️ wrk not installed. Skipping load test."
+    echo "Install wrk: https://github.com/wg/wrk"
+fi
+
+echo "📊 Monitoring resource usage of pods..."
+kubectl top pods
