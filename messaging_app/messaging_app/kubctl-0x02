@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo "🚀 Applying BLUE deployment..."
+kubectl apply -f blue_deployment.yaml
+
+echo "🚀 Applying GREEN deployment..."
+kubectl apply -f green_deployment.yaml
+
+echo "⏳ Checking rollout status for GREEN..."
+kubectl rollout status deployment/messaging-app-green
+
+echo "📜 Fetching logs from GREEN pods..."
+GREEN_PODS=$(kubectl get pods -l version=green -o name)
+
+for POD in $GREEN_PODS; do
+    echo "---- Logs from $POD ----"
+    kubectl logs $POD --tail=50
+done
+
+echo ""
+echo "✅ If logs look good, switch traffic by editing:"
+echo "   kubeservice.yaml -> selector.version: green"
+echo "Then apply:"
+echo "   kubectl apply -f kubeservice.yaml"
+echo ""
+echo "🎉 Blue-Green deployment executed successfully!"
