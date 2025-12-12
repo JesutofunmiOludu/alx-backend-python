@@ -1,0 +1,37 @@
+#!/bin/bash
+
+DEPLOYMENT="messaging-app-blue"
+SERVICE_URL="http://$(minikube ip):8000"
+
+echo "�� Starting Rolling Update for $DEPLOYMENT"
+echo ""
+
+echo "📌 Applying updated blue_deployment.yaml (image: 2.0)..."
+kubectl apply -f messaging_app/blue_deployment.yaml
+
+echo ""
+echo "⏳ Waiting for rolling update to complete..."
+kubectl rollout status deployment/$DEPLOYMENT
+
+echo ""
+echo "🔍 Testing for downtime... (20 continuous requests)"
+
+for i in {1..20}
+do
+  RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" $SERVICE_URL)
+
+  if [ "$RESPONSE" = "200" ]; then
+    echo "[$i] ✅ App responding (HTTP 200)"
+  else
+    echo "[$i] ❌ Possible downtime! Returned: $RESPONSE"
+  fi
+
+  sleep 1
+done
+
+echo ""
+echo "📦 Current Pods:"
+kubectl get pods -l app=messaging-app
+
+echo ""
+echo "🎉 Rolling update completed!"
