@@ -1,17 +1,13 @@
 pipeline {
     agent any
 
-    tools {
-        python 'Python3'
-    }
-
     stages {
 
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'github-creds',
-                    url: 'https://github.com/alx-backend-python.git',
-                    branch: 'main'
+                git branch: 'main',
+                    credentialsId: 'github-creds',
+                    url: 'https://github.com/alx-backend-python.git'
             }
         }
 
