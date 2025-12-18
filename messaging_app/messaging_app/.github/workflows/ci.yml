@@ -37,8 +37,13 @@ jobs:
         run: |
           pip3 install --upgrade pip
           pip3 install -r messaging_app/requirements.txt
+          pip3 install flake8 coverage
 
-      - name: Run Django tests
+      - name: Run flake8 linting
+        run: |
+          flake8 messaging_app
+
+      - name: Run tests with coverage
         env:
           DB_NAME: test_db
           DB_USER: test_user
@@ -46,4 +51,12 @@ jobs:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
         run: |
-          python messaging_app/manage.py test
+          coverage run --source=messaging_app messaging_app/manage.py test
+          coverage report
+          coverage xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.xml
