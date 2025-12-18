@@ -1,17 +1,20 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "laughterwrbs/messaging_app:latest"
+    }
+
     stages {
 
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'github-creds',
                     url: 'https://github.com/alx-backend-python.git'
             }
         }
 
-         stage('Install Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
                 pip3 install --upgrade pip
@@ -23,9 +26,31 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                . venv/bin/activate
                 pytest messaging_app --junitxml=test-report.xml
                 '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                docker build -t $DOCKER_IMAGE messaging_app
+                '''
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker push $DOCKER_IMAGE
+                    '''
+                }
             }
         }
     }
